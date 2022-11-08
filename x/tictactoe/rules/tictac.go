@@ -2,11 +2,10 @@ package rules
 
 import "fmt"
 import "errors"
-import "log"
 import "strings"
 import "bytes"
 
-type Player uint
+type Player byte
 
 const (
 	playerU Player = iota // unknown player
@@ -31,38 +30,38 @@ func (p Player) String() string {
 	}
 }
 
-type game struct {
+type Game struct {
 	board  [3][3]Player
 	turn   Player
 	winner Player
 }
 
-func (g game) String() string {
+func (g Game) String() string {
 
 	var b strings.Builder
 
-	// Write turn first
-	b.WriteString(fmt.Sprintf("%v\n", g.turn))
+	b.WriteString(fmt.Sprintf("Turn: %v\n", g.turn))
+	b.WriteString(fmt.Sprintf("Board: %v\n", g.turn))
 	for i := 0; i < len(g.board[0]); i++ {
 		for j := 0; j < len(g.board[0]); j++ {
-			b.WriteString(fmt.Sprintf("%v", g.board[i][j]))
+			b.WriteString(fmt.Sprintf("%v ", g.board[i][j]))
 		}
 		b.WriteString(fmt.Sprintf("\n"))
 	}
 	return b.String()
 }
 
-func NewGame() *game {
-	g := game{}
-	g.turn = playerX
+func NewGame() *Game {
+	g := Game{}
+	g.turn = playerX // playerX has first move
 	return &g
 }
 
-func (g *game) Serialize() []byte {
+func (g *Game) Serialize() []byte {
 
 	var b bytes.Buffer
 
-	// turn in first byte and the board itself in next three bytes
+	// store turn in first byte and the board itself in next three bytes
 	if g.turn == playerX {
 		b.WriteByte(1)
 	} else {
@@ -71,62 +70,59 @@ func (g *game) Serialize() []byte {
 	for i := 0; i < len(g.board[0]); i++ {
 		var x byte
 		for j := 0; j < len(g.board[0]); j++ {
-			if g.board[i][j] == playerX {
-				x |= (1 << j)
-			}
+			// 2 bits store if box in board is owned by X ('b01),
+			// O ('bl0') or not claimed by anyone U ('b00')
+			x |= (byte(g.board[i][j]) << j * 2)
 		}
 		b.WriteByte(x)
 	}
 	return b.Bytes()
 }
 
-func DeSerialize(buf []byte) *game {
+func DeSerialize(buf []byte) (*Game, error) {
 
 	g := NewGame()
 
 	b := bytes.NewBuffer(buf)
 	x, _ := b.ReadByte()
-	if x == 1 {
-		g.turn = playerX
-	} else {
-		g.turn = playerO
+	g.turn = Player(x)
+	if g.turn != playerX && g.turn != playerO {
+		return nil, errors.New("Cannot deserialize game.")
 	}
+
 	for i := 0; i < len(g.board[0]); i++ {
 		x, _ = b.ReadByte()
 		for j := 0; j < len(g.board[0]); j++ {
-			if x&(0x1<<j) != 0 {
-				g.board[i][j] = playerX
-			} else {
-				g.board[i][j] = playerO
+			g.board[i][j] = Player(x & (0x3 << j))
+			if g.turn != playerX && g.turn != playerO && g.turn != playerU {
+				return nil, errors.New("Cannot deserialize game.")
 			}
 		}
 	}
-	fmt.Println(g)
-	return g
+	return g, nil
 }
 
-func (g *game) OwnSquare(p Player, x int, y int) error {
+func (g *Game) OwnSquare(p Player, x int, y int) error {
 
 	if g.winner != playerU {
 		// already some player won the game.
 		return errors.New("Game over  ")
 	}
 
-	if g.turn != p {
-		return errors.New("Not your turn ")
-	}
-
-	if x > len(g.board[0]) || y > len(g.board[0]) {
-		return errors.New("Bad x or y ")
-
-	}
-
 	if p != playerX && p != playerU {
 		return errors.New("Bad Player")
 	}
 
+	if g.turn != p {
+		return errors.New("Not your turn ")
+	}
+
+	if x < 0 || y < 0 || x > len(g.board[0]) || y > len(g.board[0]) {
+		return errors.New("Bad x or y ")
+	}
+
 	if g.board[x][y] != playerU {
-		return errors.New("Already used up square ")
+		return errors.New("Already claimed square ")
 	}
 
 	g.board[x][y] = p
@@ -139,7 +135,7 @@ func (g *game) OwnSquare(p Player, x int, y int) error {
 	return nil
 }
 
-func (g *game) checkWinner() Player {
+func (g *Game) checkWinner() Player {
 
 	b := &g.board
 
@@ -165,6 +161,7 @@ func (g *game) checkWinner() Player {
 	return playerU
 }
 
+/*
 func main() {
 	g := NewGame()
 	fmt.Println(g)
@@ -180,3 +177,4 @@ func main() {
 	x := g.Serialize()
 	fmt.Printf("%v \n", DeSerialize(x))
 }
+*/
