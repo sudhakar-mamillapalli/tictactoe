@@ -1,0 +1,9 @@
+syntax = "proto3";
+package sudhakarmamillapalli.tictactoe.tictactoe;
+
+option go_package = "github.com/sudhakar-mamillapalli/tictactoe/x/tictactoe/types";
+
+message SystemInfo {
+  uint64 nextId = 1; 
+  
+}

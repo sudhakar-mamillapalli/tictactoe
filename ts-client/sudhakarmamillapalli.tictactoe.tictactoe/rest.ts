@@ -25,12 +25,21 @@ export interface RpcStatus {
  */
 export type TictactoeParams = object;
 
+export interface TictactoeQueryGetSystemInfoResponse {
+  SystemInfo?: TictactoeSystemInfo;
+}
+
 /**
  * QueryParamsResponse is response type for the Query/Params RPC method.
  */
 export interface TictactoeQueryParamsResponse {
   /** params holds all the parameters of this module. */
   params?: TictactoeParams;
+}
+
+export interface TictactoeSystemInfo {
+  /** @format uint64 */
+  nextId?: string;
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from "axios";
@@ -169,6 +178,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryParams = (params: RequestParams = {}) =>
     this.request<TictactoeQueryParamsResponse, RpcStatus>({
       path: `/sudhakar-mamillapalli/tictactoe/tictactoe/params`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QuerySystemInfo
+   * @summary Queries a SystemInfo by index.
+   * @request GET:/sudhakar-mamillapalli/tictactoe/tictactoe/system_info
+   */
+  querySystemInfo = (params: RequestParams = {}) =>
+    this.request<TictactoeQueryGetSystemInfoResponse, RpcStatus>({
+      path: `/sudhakar-mamillapalli/tictactoe/tictactoe/system_info`,
       method: "GET",
       format: "json",
       ...params,
