@@ -8,7 +8,7 @@ import "bytes"
 type Player byte
 
 const (
-	playerU Player = iota // unknown player
+	playerU Player = iota // used to demarcate no player claimed a square
 	playerX
 	playerO
 )
@@ -41,7 +41,7 @@ func (g Game) String() string {
 	var b strings.Builder
 
 	b.WriteString(fmt.Sprintf("Turn: %v\n", g.turn))
-	b.WriteString(fmt.Sprintf("Board: %v\n", g.turn))
+	b.WriteString(fmt.Sprintf("Board: \n"))
 	for i := 0; i < len(g.board[0]); i++ {
 		for j := 0; j < len(g.board[0]); j++ {
 			b.WriteString(fmt.Sprintf("%v ", g.board[i][j]))
@@ -53,7 +53,7 @@ func (g Game) String() string {
 
 func NewGame() *Game {
 	g := Game{}
-	g.turn = playerX // playerX has first move
+	g.turn = playerX // playerX has first move by default
 	return &g
 }
 
@@ -72,7 +72,7 @@ func (g *Game) Serialize() []byte {
 		for j := 0; j < len(g.board[0]); j++ {
 			// 2 bits store if box in board is owned by X ('b01),
 			// O ('bl0') or not claimed by anyone U ('b00')
-			x |= (byte(g.board[i][j]) << j * 2)
+			x |= (byte(g.board[i][j]) << (j * 2))
 		}
 		b.WriteByte(x)
 	}
@@ -85,20 +85,23 @@ func DeSerialize(buf []byte) (*Game, error) {
 
 	b := bytes.NewBuffer(buf)
 	x, _ := b.ReadByte()
-	g.turn = Player(x)
-	if g.turn != playerX && g.turn != playerO {
+    turn := Player(x)
+	if turn != playerX && turn != playerO {
 		return nil, errors.New("Cannot deserialize game.")
 	}
+	g.turn = turn
 
 	for i := 0; i < len(g.board[0]); i++ {
 		x, _ = b.ReadByte()
 		for j := 0; j < len(g.board[0]); j++ {
-			g.board[i][j] = Player(x & (0x3 << j))
-			if g.turn != playerX && g.turn != playerO && g.turn != playerU {
+            player := Player((x >> (2*j)) & 0x3)
+			if player != playerX && player != playerO && player != playerU {
 				return nil, errors.New("Cannot deserialize game.")
 			}
+			g.board[i][j] = player
 		}
 	}
+	g.winner = g.checkWinner()
 	return g, nil
 }
 
@@ -109,7 +112,7 @@ func (g *Game) OwnSquare(p Player, x int, y int) error {
 		return errors.New("Game over  ")
 	}
 
-	if p != playerX && p != playerU {
+	if p != playerX && p != playerO {
 		return errors.New("Bad Player")
 	}
 
