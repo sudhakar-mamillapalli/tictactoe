@@ -34,6 +34,10 @@ export interface TictactoeInitiateGame {
   creator?: string;
 }
 
+export interface TictactoeMsgCreateGameResponse {
+  gameIndex?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
