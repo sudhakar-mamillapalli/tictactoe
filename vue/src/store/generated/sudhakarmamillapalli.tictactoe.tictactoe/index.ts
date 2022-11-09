@@ -1,12 +1,13 @@
 import { Client, registry, MissingWalletError } from 'sudhakar-mamillapalli-tictactoe-client-ts'
 
 import { CompletedGame } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
+import { InitiateGame } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { Params } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { StoredGame } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { SystemInfo } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 
 
-export { CompletedGame, Params, StoredGame, SystemInfo };
+export { CompletedGame, InitiateGame, Params, StoredGame, SystemInfo };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -43,9 +44,12 @@ const getDefaultState = () => {
 				StoredGameAll: {},
 				CompletedGame: {},
 				CompletedGameAll: {},
+				InitiateGame: {},
+				InitiateGameAll: {},
 				
 				_Structure: {
 						CompletedGame: getStructure(CompletedGame.fromPartial({})),
+						InitiateGame: getStructure(InitiateGame.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						StoredGame: getStructure(StoredGame.fromPartial({})),
 						SystemInfo: getStructure(SystemInfo.fromPartial({})),
@@ -112,6 +116,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.CompletedGameAll[JSON.stringify(params)] ?? {}
+		},
+				getInitiateGame: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.InitiateGame[JSON.stringify(params)] ?? {}
+		},
+				getInitiateGameAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.InitiateGameAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -282,6 +298,54 @@ export default {
 				return getters['getCompletedGameAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryCompletedGameAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryInitiateGame({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.SudhakarmamillapalliTictactoeTictactoe.query.queryInitiateGame( key.index)).data
+				
+					
+				commit('QUERY', { query: 'InitiateGame', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryInitiateGame', payload: { options: { all }, params: {...key},query }})
+				return getters['getInitiateGame']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryInitiateGame API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryInitiateGameAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.SudhakarmamillapalliTictactoeTictactoe.query.queryInitiateGameAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.SudhakarmamillapalliTictactoeTictactoe.query.queryInitiateGameAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'InitiateGameAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryInitiateGameAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getInitiateGameAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryInitiateGameAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

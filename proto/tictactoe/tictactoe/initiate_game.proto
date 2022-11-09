@@ -1,0 +1,12 @@
+syntax = "proto3";
+package sudhakarmamillapalli.tictactoe.tictactoe;
+
+option go_package = "github.com/sudhakar-mamillapalli/tictactoe/x/tictactoe/types";
+
+message InitiateGame {
+  string index = 1; 
+  string board = 2; 
+  string creator = 3; 
+  
+}
+

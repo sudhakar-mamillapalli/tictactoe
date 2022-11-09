@@ -2,6 +2,7 @@
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
 import { CompletedGame } from "./completed_game";
+import { InitiateGame } from "./initiate_game";
 import { Params } from "./params";
 import { StoredGame } from "./stored_game";
 import { SystemInfo } from "./system_info";
@@ -56,6 +57,23 @@ export interface QueryAllCompletedGameRequest {
 
 export interface QueryAllCompletedGameResponse {
   completedGame: CompletedGame[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetInitiateGameRequest {
+  index: string;
+}
+
+export interface QueryGetInitiateGameResponse {
+  initiateGame: InitiateGame | undefined;
+}
+
+export interface QueryAllInitiateGameRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllInitiateGameResponse {
+  initiateGame: InitiateGame[];
   pagination: PageResponse | undefined;
 }
 
@@ -666,6 +684,220 @@ export const QueryAllCompletedGameResponse = {
   },
 };
 
+function createBaseQueryGetInitiateGameRequest(): QueryGetInitiateGameRequest {
+  return { index: "" };
+}
+
+export const QueryGetInitiateGameRequest = {
+  encode(message: QueryGetInitiateGameRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.index !== "") {
+      writer.uint32(10).string(message.index);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetInitiateGameRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetInitiateGameRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.index = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetInitiateGameRequest {
+    return { index: isSet(object.index) ? String(object.index) : "" };
+  },
+
+  toJSON(message: QueryGetInitiateGameRequest): unknown {
+    const obj: any = {};
+    message.index !== undefined && (obj.index = message.index);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetInitiateGameRequest>, I>>(object: I): QueryGetInitiateGameRequest {
+    const message = createBaseQueryGetInitiateGameRequest();
+    message.index = object.index ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryGetInitiateGameResponse(): QueryGetInitiateGameResponse {
+  return { initiateGame: undefined };
+}
+
+export const QueryGetInitiateGameResponse = {
+  encode(message: QueryGetInitiateGameResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.initiateGame !== undefined) {
+      InitiateGame.encode(message.initiateGame, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetInitiateGameResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetInitiateGameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiateGame = InitiateGame.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetInitiateGameResponse {
+    return { initiateGame: isSet(object.initiateGame) ? InitiateGame.fromJSON(object.initiateGame) : undefined };
+  },
+
+  toJSON(message: QueryGetInitiateGameResponse): unknown {
+    const obj: any = {};
+    message.initiateGame !== undefined
+      && (obj.initiateGame = message.initiateGame ? InitiateGame.toJSON(message.initiateGame) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetInitiateGameResponse>, I>>(object: I): QueryGetInitiateGameResponse {
+    const message = createBaseQueryGetInitiateGameResponse();
+    message.initiateGame = (object.initiateGame !== undefined && object.initiateGame !== null)
+      ? InitiateGame.fromPartial(object.initiateGame)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllInitiateGameRequest(): QueryAllInitiateGameRequest {
+  return { pagination: undefined };
+}
+
+export const QueryAllInitiateGameRequest = {
+  encode(message: QueryAllInitiateGameRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllInitiateGameRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllInitiateGameRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllInitiateGameRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllInitiateGameRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllInitiateGameRequest>, I>>(object: I): QueryAllInitiateGameRequest {
+    const message = createBaseQueryAllInitiateGameRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllInitiateGameResponse(): QueryAllInitiateGameResponse {
+  return { initiateGame: [], pagination: undefined };
+}
+
+export const QueryAllInitiateGameResponse = {
+  encode(message: QueryAllInitiateGameResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.initiateGame) {
+      InitiateGame.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllInitiateGameResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllInitiateGameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiateGame.push(InitiateGame.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllInitiateGameResponse {
+    return {
+      initiateGame: Array.isArray(object?.initiateGame)
+        ? object.initiateGame.map((e: any) => InitiateGame.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllInitiateGameResponse): unknown {
+    const obj: any = {};
+    if (message.initiateGame) {
+      obj.initiateGame = message.initiateGame.map((e) => e ? InitiateGame.toJSON(e) : undefined);
+    } else {
+      obj.initiateGame = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllInitiateGameResponse>, I>>(object: I): QueryAllInitiateGameResponse {
+    const message = createBaseQueryAllInitiateGameResponse();
+    message.initiateGame = object.initiateGame?.map((e) => InitiateGame.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -680,6 +912,10 @@ export interface Query {
   CompletedGame(request: QueryGetCompletedGameRequest): Promise<QueryGetCompletedGameResponse>;
   /** Queries a list of CompletedGame items. */
   CompletedGameAll(request: QueryAllCompletedGameRequest): Promise<QueryAllCompletedGameResponse>;
+  /** Queries a InitiateGame by index. */
+  InitiateGame(request: QueryGetInitiateGameRequest): Promise<QueryGetInitiateGameResponse>;
+  /** Queries a list of InitiateGame items. */
+  InitiateGameAll(request: QueryAllInitiateGameRequest): Promise<QueryAllInitiateGameResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -692,6 +928,8 @@ export class QueryClientImpl implements Query {
     this.StoredGameAll = this.StoredGameAll.bind(this);
     this.CompletedGame = this.CompletedGame.bind(this);
     this.CompletedGameAll = this.CompletedGameAll.bind(this);
+    this.InitiateGame = this.InitiateGame.bind(this);
+    this.InitiateGameAll = this.InitiateGameAll.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -727,6 +965,18 @@ export class QueryClientImpl implements Query {
     const data = QueryAllCompletedGameRequest.encode(request).finish();
     const promise = this.rpc.request("sudhakarmamillapalli.tictactoe.tictactoe.Query", "CompletedGameAll", data);
     return promise.then((data) => QueryAllCompletedGameResponse.decode(new _m0.Reader(data)));
+  }
+
+  InitiateGame(request: QueryGetInitiateGameRequest): Promise<QueryGetInitiateGameResponse> {
+    const data = QueryGetInitiateGameRequest.encode(request).finish();
+    const promise = this.rpc.request("sudhakarmamillapalli.tictactoe.tictactoe.Query", "InitiateGame", data);
+    return promise.then((data) => QueryGetInitiateGameResponse.decode(new _m0.Reader(data)));
+  }
+
+  InitiateGameAll(request: QueryAllInitiateGameRequest): Promise<QueryAllInitiateGameResponse> {
+    const data = QueryAllInitiateGameRequest.encode(request).finish();
+    const promise = this.rpc.request("sudhakarmamillapalli.tictactoe.tictactoe.Query", "InitiateGameAll", data);
+    return promise.then((data) => QueryAllInitiateGameResponse.decode(new _m0.Reader(data)));
   }
 }
 

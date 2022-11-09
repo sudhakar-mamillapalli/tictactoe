@@ -6,6 +6,7 @@ import "tictactoe/tictactoe/params.proto";
 import "tictactoe/tictactoe/system_info.proto";
 import "tictactoe/tictactoe/stored_game.proto";
 import "tictactoe/tictactoe/completed_game.proto";
+import "tictactoe/tictactoe/initiate_game.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/sudhakar-mamillapalli/tictactoe/x/tictactoe/types";
@@ -16,5 +17,6 @@ message GenesisState {
   SystemInfo systemInfo = 2 [(gogoproto.nullable) = false];
   repeated StoredGame storedGameList = 3 [(gogoproto.nullable) = false];
   repeated CompletedGame completedGameList = 4 [(gogoproto.nullable) = false];
+  repeated InitiateGame initiateGameList = 5 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

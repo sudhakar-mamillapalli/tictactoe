@@ -28,6 +28,12 @@ export interface TictactoeCompletedGame {
   winner?: string;
 }
 
+export interface TictactoeInitiateGame {
+  index?: string;
+  board?: string;
+  creator?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
@@ -35,6 +41,21 @@ export type TictactoeParams = object;
 
 export interface TictactoeQueryAllCompletedGameResponse {
   completedGame?: TictactoeCompletedGame[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface TictactoeQueryAllInitiateGameResponse {
+  initiateGame?: TictactoeInitiateGame[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -65,6 +86,10 @@ export interface TictactoeQueryAllStoredGameResponse {
 
 export interface TictactoeQueryGetCompletedGameResponse {
   completedGame?: TictactoeCompletedGame;
+}
+
+export interface TictactoeQueryGetInitiateGameResponse {
+  initiateGame?: TictactoeInitiateGame;
 }
 
 export interface TictactoeQueryGetStoredGameResponse {
@@ -329,6 +354,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryCompletedGame = (index: string, params: RequestParams = {}) =>
     this.request<TictactoeQueryGetCompletedGameResponse, RpcStatus>({
       path: `/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game/${index}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryInitiateGameAll
+   * @summary Queries a list of InitiateGame items.
+   * @request GET:/sudhakar-mamillapalli/tictactoe/tictactoe/initiate_game
+   */
+  queryInitiateGameAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<TictactoeQueryAllInitiateGameResponse, RpcStatus>({
+      path: `/sudhakar-mamillapalli/tictactoe/tictactoe/initiate_game`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryInitiateGame
+   * @summary Queries a InitiateGame by index.
+   * @request GET:/sudhakar-mamillapalli/tictactoe/tictactoe/initiate_game/{index}
+   */
+  queryInitiateGame = (index: string, params: RequestParams = {}) =>
+    this.request<TictactoeQueryGetInitiateGameResponse, RpcStatus>({
+      path: `/sudhakar-mamillapalli/tictactoe/tictactoe/initiate_game/${index}`,
       method: "GET",
       format: "json",
       ...params,

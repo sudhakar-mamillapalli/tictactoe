@@ -1,6 +1,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { CompletedGame } from "./completed_game";
+import { InitiateGame } from "./initiate_game";
 import { Params } from "./params";
 import { StoredGame } from "./stored_game";
 import { SystemInfo } from "./system_info";
@@ -12,12 +13,13 @@ export interface GenesisState {
   params: Params | undefined;
   systemInfo: SystemInfo | undefined;
   storedGameList: StoredGame[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   completedGameList: CompletedGame[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  initiateGameList: InitiateGame[];
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, systemInfo: undefined, storedGameList: [], completedGameList: [] };
+  return { params: undefined, systemInfo: undefined, storedGameList: [], completedGameList: [], initiateGameList: [] };
 }
 
 export const GenesisState = {
@@ -33,6 +35,9 @@ export const GenesisState = {
     }
     for (const v of message.completedGameList) {
       CompletedGame.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.initiateGameList) {
+      InitiateGame.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -56,6 +61,9 @@ export const GenesisState = {
         case 4:
           message.completedGameList.push(CompletedGame.decode(reader, reader.uint32()));
           break;
+        case 5:
+          message.initiateGameList.push(InitiateGame.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -73,6 +81,9 @@ export const GenesisState = {
         : [],
       completedGameList: Array.isArray(object?.completedGameList)
         ? object.completedGameList.map((e: any) => CompletedGame.fromJSON(e))
+        : [],
+      initiateGameList: Array.isArray(object?.initiateGameList)
+        ? object.initiateGameList.map((e: any) => InitiateGame.fromJSON(e))
         : [],
     };
   },
@@ -92,6 +103,11 @@ export const GenesisState = {
     } else {
       obj.completedGameList = [];
     }
+    if (message.initiateGameList) {
+      obj.initiateGameList = message.initiateGameList.map((e) => e ? InitiateGame.toJSON(e) : undefined);
+    } else {
+      obj.initiateGameList = [];
+    }
     return obj;
   },
 
@@ -105,6 +121,7 @@ export const GenesisState = {
       : undefined;
     message.storedGameList = object.storedGameList?.map((e) => StoredGame.fromPartial(e)) || [];
     message.completedGameList = object.completedGameList?.map((e) => CompletedGame.fromPartial(e)) || [];
+    message.initiateGameList = object.initiateGameList?.map((e) => InitiateGame.fromPartial(e)) || [];
     return message;
   },
 };
