@@ -11,4 +11,6 @@ var (
 	ErrInvalidPlayerX   = sdkerrors.Register(ModuleName, 1100, "player X address is invalid: %s")
 	ErrInvalidPlayerO   = sdkerrors.Register(ModuleName, 1101, "player O address is invalid: %s")
 	ErrGameNotParseable = sdkerrors.Register(ModuleName, 1102, "game cannot be parsed")
+	ErrInvalidWinner    = sdkerrors.Register(ModuleName, 1103, "winner address is invalid: %s")
+	ErrInvalidCreator   = sdkerrors.Register(ModuleName, 1104, "initiator address is invalid: %s")
 )

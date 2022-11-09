@@ -15,6 +15,15 @@ const (
 	carol = "cosmos1e0w5t53nrq7p66fye6c8p0ynyhf6y24l4yuxd7"
 )
 
+// TODO add tests for IntiatedGame and CompletedGames
+func GetInitiatedGame1() types.InitiateGame {
+	return types.InitiateGame{
+		Creator: alice,
+		Index:   "1",
+		Board:   string(rules.NewGame().Serialize()),
+	}
+}
+
 func GetStoredGame1() types.StoredGame {
 	return types.StoredGame{
 		PlayerX: alice,
@@ -24,6 +33,15 @@ func GetStoredGame1() types.StoredGame {
 	}
 }
 
+func GetCompletedGame1() types.CompletedGame {
+	return types.CompletedGame{
+		PlayerX: alice,
+		PlayerO: bob,
+		Winner:  alice,
+		Index:   "1",
+		Board:   string(rules.NewGame().Serialize()), // fix
+	}
+}
 func TestCanGetAddressPlayerX(t *testing.T) {
 	aliceAddress, err1 := sdk.AccAddressFromBech32(alice)
 	playerX, err2 := GetStoredGame1().GetPlayerXAddress()
