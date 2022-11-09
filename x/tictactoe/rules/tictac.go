@@ -85,7 +85,7 @@ func DeSerialize(buf []byte) (*Game, error) {
 
 	b := bytes.NewBuffer(buf)
 	x, _ := b.ReadByte()
-    turn := Player(x)
+	turn := Player(x)
 	if turn != playerX && turn != playerO {
 		return nil, errors.New("Cannot deserialize game.")
 	}
@@ -94,7 +94,7 @@ func DeSerialize(buf []byte) (*Game, error) {
 	for i := 0; i < len(g.board[0]); i++ {
 		x, _ = b.ReadByte()
 		for j := 0; j < len(g.board[0]); j++ {
-            player := Player((x >> (2*j)) & 0x3)
+			player := Player((x >> (2 * j)) & 0x3)
 			if player != playerX && player != playerO && player != playerU {
 				return nil, errors.New("Cannot deserialize game.")
 			}

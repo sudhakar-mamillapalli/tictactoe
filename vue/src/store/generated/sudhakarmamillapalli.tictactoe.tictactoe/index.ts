@@ -1,11 +1,12 @@
 import { Client, registry, MissingWalletError } from 'sudhakar-mamillapalli-tictactoe-client-ts'
 
+import { CompletedGame } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { Params } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { StoredGame } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 import { SystemInfo } from "sudhakar-mamillapalli-tictactoe-client-ts/sudhakarmamillapalli.tictactoe.tictactoe/types"
 
 
-export { Params, StoredGame, SystemInfo };
+export { CompletedGame, Params, StoredGame, SystemInfo };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -40,8 +41,11 @@ const getDefaultState = () => {
 				SystemInfo: {},
 				StoredGame: {},
 				StoredGameAll: {},
+				CompletedGame: {},
+				CompletedGameAll: {},
 				
 				_Structure: {
+						CompletedGame: getStructure(CompletedGame.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						StoredGame: getStructure(StoredGame.fromPartial({})),
 						SystemInfo: getStructure(SystemInfo.fromPartial({})),
@@ -96,6 +100,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.StoredGameAll[JSON.stringify(params)] ?? {}
+		},
+				getCompletedGame: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.CompletedGame[JSON.stringify(params)] ?? {}
+		},
+				getCompletedGameAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.CompletedGameAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -218,6 +234,54 @@ export default {
 				return getters['getStoredGameAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryStoredGameAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCompletedGame({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.SudhakarmamillapalliTictactoeTictactoe.query.queryCompletedGame( key.index)).data
+				
+					
+				commit('QUERY', { query: 'CompletedGame', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCompletedGame', payload: { options: { all }, params: {...key},query }})
+				return getters['getCompletedGame']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCompletedGame API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryCompletedGameAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.SudhakarmamillapalliTictactoeTictactoe.query.queryCompletedGameAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.SudhakarmamillapalliTictactoeTictactoe.query.queryCompletedGameAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'CompletedGameAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryCompletedGameAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getCompletedGameAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryCompletedGameAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -20,10 +20,33 @@ export interface RpcStatus {
   details?: ProtobufAny[];
 }
 
+export interface TictactoeCompletedGame {
+  index?: string;
+  board?: string;
+  playerX?: string;
+  playerO?: string;
+  winner?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
 export type TictactoeParams = object;
+
+export interface TictactoeQueryAllCompletedGameResponse {
+  completedGame?: TictactoeCompletedGame[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface TictactoeQueryAllStoredGameResponse {
   storedGame?: TictactoeStoredGame[];
@@ -38,6 +61,10 @@ export interface TictactoeQueryAllStoredGameResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface TictactoeQueryGetCompletedGameResponse {
+  completedGame?: TictactoeCompletedGame;
 }
 
 export interface TictactoeQueryGetStoredGameResponse {
@@ -261,10 +288,52 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title tictactoe/tictactoe/genesis.proto
+ * @title tictactoe/tictactoe/completed_game.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCompletedGameAll
+   * @summary Queries a list of CompletedGame items.
+   * @request GET:/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game
+   */
+  queryCompletedGameAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<TictactoeQueryAllCompletedGameResponse, RpcStatus>({
+      path: `/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCompletedGame
+   * @summary Queries a CompletedGame by index.
+   * @request GET:/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game/{index}
+   */
+  queryCompletedGame = (index: string, params: RequestParams = {}) =>
+    this.request<TictactoeQueryGetCompletedGameResponse, RpcStatus>({
+      path: `/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game/${index}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

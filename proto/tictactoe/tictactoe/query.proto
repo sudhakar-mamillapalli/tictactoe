@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "tictactoe/tictactoe/params.proto";
 import "tictactoe/tictactoe/system_info.proto";
 import "tictactoe/tictactoe/stored_game.proto";
+import "tictactoe/tictactoe/completed_game.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/sudhakar-mamillapalli/tictactoe/x/tictactoe/types";
@@ -29,6 +30,16 @@ service Query {
 	// Queries a list of StoredGame items.
 	rpc StoredGameAll(QueryAllStoredGameRequest) returns (QueryAllStoredGameResponse) {
 		option (google.api.http).get = "/sudhakar-mamillapalli/tictactoe/tictactoe/stored_game";
+	}
+
+// Queries a CompletedGame by index.
+	rpc CompletedGame(QueryGetCompletedGameRequest) returns (QueryGetCompletedGameResponse) {
+		option (google.api.http).get = "/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game/{index}";
+	}
+
+	// Queries a list of CompletedGame items.
+	rpc CompletedGameAll(QueryAllCompletedGameRequest) returns (QueryAllCompletedGameResponse) {
+		option (google.api.http).get = "/sudhakar-mamillapalli/tictactoe/tictactoe/completed_game";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -63,6 +74,24 @@ message QueryAllStoredGameRequest {
 
 message QueryAllStoredGameResponse {
 	repeated StoredGame storedGame = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetCompletedGameRequest {
+	  string index = 1;
+
+}
+
+message QueryGetCompletedGameResponse {
+	CompletedGame completedGame = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllCompletedGameRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllCompletedGameResponse {
+	repeated CompletedGame completedGame = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

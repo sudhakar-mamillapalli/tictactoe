@@ -10,10 +10,11 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		SystemInfo:     SystemInfo {
-            NextId: uint64(DefaultIndex),
-        },
-		StoredGameList: []StoredGame{},
+		SystemInfo: SystemInfo{
+			NextId: uint64(DefaultIndex),
+		},
+		StoredGameList:    []StoredGame{},
+		CompletedGameList: []CompletedGame{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -31,6 +32,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for storedGame")
 		}
 		storedGameIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in completedGame
+	completedGameIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.CompletedGameList {
+		index := string(CompletedGameKey(elem.Index))
+		if _, ok := completedGameIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for completedGame")
+		}
+		completedGameIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
