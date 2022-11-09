@@ -8,9 +8,10 @@ import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgCreateGame } from "./types/tictactoe/tictactoe/tx";
+import { MsgStartGame } from "./types/tictactoe/tictactoe/tx";
 
 
-export { MsgCreateGame };
+export { MsgCreateGame, MsgStartGame };
 
 type sendMsgCreateGameParams = {
   value: MsgCreateGame,
@@ -18,9 +19,19 @@ type sendMsgCreateGameParams = {
   memo?: string
 };
 
+type sendMsgStartGameParams = {
+  value: MsgStartGame,
+  fee?: StdFee,
+  memo?: string
+};
+
 
 type msgCreateGameParams = {
   value: MsgCreateGame,
+};
+
+type msgStartGameParams = {
+  value: MsgStartGame,
 };
 
 
@@ -55,12 +66,34 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		async sendMsgStartGame({ value, fee, memo }: sendMsgStartGameParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgStartGame: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgStartGame({ value: MsgStartGame.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgStartGame: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		
 		msgCreateGame({ value }: msgCreateGameParams): EncodeObject {
 			try {
 				return { typeUrl: "/sudhakarmamillapalli.tictactoe.tictactoe.MsgCreateGame", value: MsgCreateGame.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgCreateGame: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgStartGame({ value }: msgStartGameParams): EncodeObject {
+			try {
+				return { typeUrl: "/sudhakarmamillapalli.tictactoe.tictactoe.MsgStartGame", value: MsgStartGame.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgStartGame: Could not create message: ' + e.message)
 			}
 		},
 		

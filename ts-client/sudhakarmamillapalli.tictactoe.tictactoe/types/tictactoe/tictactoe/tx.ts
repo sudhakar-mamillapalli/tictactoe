@@ -11,6 +11,15 @@ export interface MsgCreateGameResponse {
   gameIndex: string;
 }
 
+export interface MsgStartGame {
+  creator: string;
+  gameIndex: string;
+}
+
+export interface MsgStartGameResponse {
+  gameIndex: string;
+}
+
 function createBaseMsgCreateGame(): MsgCreateGame {
   return { creator: "" };
 }
@@ -105,10 +114,116 @@ export const MsgCreateGameResponse = {
   },
 };
 
+function createBaseMsgStartGame(): MsgStartGame {
+  return { creator: "", gameIndex: "" };
+}
+
+export const MsgStartGame = {
+  encode(message: MsgStartGame, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.gameIndex !== "") {
+      writer.uint32(18).string(message.gameIndex);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStartGame {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStartGame();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.gameIndex = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgStartGame {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      gameIndex: isSet(object.gameIndex) ? String(object.gameIndex) : "",
+    };
+  },
+
+  toJSON(message: MsgStartGame): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.gameIndex !== undefined && (obj.gameIndex = message.gameIndex);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgStartGame>, I>>(object: I): MsgStartGame {
+    const message = createBaseMsgStartGame();
+    message.creator = object.creator ?? "";
+    message.gameIndex = object.gameIndex ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgStartGameResponse(): MsgStartGameResponse {
+  return { gameIndex: "" };
+}
+
+export const MsgStartGameResponse = {
+  encode(message: MsgStartGameResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.gameIndex !== "") {
+      writer.uint32(10).string(message.gameIndex);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStartGameResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStartGameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.gameIndex = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgStartGameResponse {
+    return { gameIndex: isSet(object.gameIndex) ? String(object.gameIndex) : "" };
+  },
+
+  toJSON(message: MsgStartGameResponse): unknown {
+    const obj: any = {};
+    message.gameIndex !== undefined && (obj.gameIndex = message.gameIndex);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgStartGameResponse>, I>>(object: I): MsgStartGameResponse {
+    const message = createBaseMsgStartGameResponse();
+    message.gameIndex = object.gameIndex ?? "";
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   CreateGame(request: MsgCreateGame): Promise<MsgCreateGameResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  StartGame(request: MsgStartGame): Promise<MsgStartGameResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -116,11 +231,18 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.CreateGame = this.CreateGame.bind(this);
+    this.StartGame = this.StartGame.bind(this);
   }
   CreateGame(request: MsgCreateGame): Promise<MsgCreateGameResponse> {
     const data = MsgCreateGame.encode(request).finish();
     const promise = this.rpc.request("sudhakarmamillapalli.tictactoe.tictactoe.Msg", "CreateGame", data);
     return promise.then((data) => MsgCreateGameResponse.decode(new _m0.Reader(data)));
+  }
+
+  StartGame(request: MsgStartGame): Promise<MsgStartGameResponse> {
+    const data = MsgStartGame.encode(request).finish();
+    const promise = this.rpc.request("sudhakarmamillapalli.tictactoe.tictactoe.Msg", "StartGame", data);
+    return promise.then((data) => MsgStartGameResponse.decode(new _m0.Reader(data)));
   }
 }
 

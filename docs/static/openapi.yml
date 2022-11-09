@@ -74314,6 +74314,11 @@ definitions:
     properties:
       gameIndex:
         type: string
+  sudhakarmamillapalli.tictactoe.tictactoe.MsgStartGameResponse:
+    type: object
+    properties:
+      gameIndex:
+        type: string
   sudhakarmamillapalli.tictactoe.tictactoe.Params:
     type: object
     description: Params defines the parameters for the module.
