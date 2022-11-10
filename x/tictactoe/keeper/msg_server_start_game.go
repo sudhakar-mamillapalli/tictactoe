@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-    "crypto/sha256"
+	"crypto/sha256"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -13,30 +13,30 @@ func (k msgServer) StartGame(goCtx context.Context, msg *types.MsgStartGame) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// TODO: Handling the message
-    //1. Find the initiated game
-    iGame, found := k.Keeper.GetInitiateGame(ctx, msg.GameIndex)
-    if !found {
-        return nil, sdkerrors.Wrapf(types.ErrGameNotFound, "%s", msg.GameIndex)
-    }
+	//1. Find the initiated game
+	iGame, found := k.Keeper.GetInitiateGame(ctx, msg.GameIndex)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrGameNotFound, "%s", msg.GameIndex)
+	}
 
-    // Now the person who initiated/created the game (iGame.Creator) will be
-    // one player and the one who sends this startGame message (msg.Creator)
-    // will be the second player One will be playerX and the other playerO. Who
-    // will be what? Concatenate keys and take hash of it.  If first bit is 0
-    // then game initiator plays "O" and the second player plays "X" or vice
-    // versa X will have the first move
-    temp := sha256.Sum256([]byte(iGame.Creator + msg.Creator))
-    first_bit := (temp[0] & 0x80) >> 7 // most significant bit
-    playerX := iGame.Creator
-    playerO := msg.Creator
-    if first_bit == 0 {
-        playerX, playerO = playerO, playerX
-    }
+	// Now the person who initiated/created the game (iGame.Creator) will be
+	// one player and the one who sends this startGame message (msg.Creator)
+	// will be the second player One will be playerX and the other playerO. Who
+	// will be what? Concatenate keys and take hash of it.  If first bit is 0
+	// then game initiator plays "O" and the second player plays "X" or vice
+	// versa X will have the first move
+	temp := sha256.Sum256([]byte(iGame.Creator + msg.Creator))
+	first_bit := (temp[0] & 0x80) >> 7 // most significant bit
+	playerX := iGame.Creator
+	playerO := msg.Creator
+	if first_bit == 0 {
+		playerX, playerO = playerO, playerX
+	}
 
 	// Create the object to be stored
 	storedGame := types.StoredGame{
-		Index: msg.GameIndex,
-		Board: iGame.Board,
+		Index:   msg.GameIndex,
+		Board:   iGame.Board,
 		PlayerX: playerX,
 		PlayerO: playerO,
 	}
@@ -57,10 +57,10 @@ func (k msgServer) StartGame(goCtx context.Context, msg *types.MsgStartGame) (*t
 	// save the StoredGame object. keeper/msg_server.go has MsgServer def
 	k.Keeper.SetStoredGame(ctx, storedGame)
 
-    // Remove the game from InitiatedGames list
-    k.Keeper.RemoveInitiateGame(ctx, msg.GameIndex)
+	// Remove the game from InitiatedGames list
+	k.Keeper.RemoveInitiateGame(ctx, msg.GameIndex)
 
-    // Useless. Makes no sense returning gameIndex as response. FIX
+	// Useless. Makes no sense returning gameIndex as response. FIX
 	return &types.MsgStartGameResponse{
 		GameIndex: msg.GameIndex,
 	}, nil

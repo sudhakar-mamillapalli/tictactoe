@@ -34,6 +34,10 @@ export interface TictactoeInitiateGame {
   creator?: string;
 }
 
+export interface TictactoeMsgClaimSquareResponse {
+  winner?: string;
+}
+
 export interface TictactoeMsgCreateGameResponse {
   gameIndex?: string;
 }

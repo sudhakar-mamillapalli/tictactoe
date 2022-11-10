@@ -74309,6 +74309,11 @@ definitions:
         type: string
       creator:
         type: string
+  sudhakarmamillapalli.tictactoe.tictactoe.MsgClaimSquareResponse:
+    type: object
+    properties:
+      winner:
+        type: string
   sudhakarmamillapalli.tictactoe.tictactoe.MsgCreateGameResponse:
     type: object
     properties:
