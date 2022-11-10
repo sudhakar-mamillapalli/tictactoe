@@ -4,7 +4,7 @@ import "testing"
 
 func TestNewGame(t *testing.T) {
 	g := NewGame()
-	if g.turn != playerX {
+	if g.turn != PlayerX {
 		t.Fatal("Wrong player turn")
 	}
 }
@@ -24,11 +24,11 @@ func TestNewGameSerializeDeSerialize(t *testing.T) {
 
 func TestPlayerMove(t *testing.T) {
 	g := NewGame()
-	err := g.OwnSquare(playerX, 0, 0)
+	err := g.OwnSquare(PlayerX, 0, 0)
 	if err != nil {
 		t.Fatalf("Valid player move resulted in error %v", err)
 	}
-	err = g.OwnSquare(playerO, 1, 0)
+	err = g.OwnSquare(PlayerO, 1, 0)
 	if err != nil {
 		t.Fatalf("Valid player move resulted in error %v %v", err, g)
 	}
@@ -42,11 +42,11 @@ func TestPlayerMove(t *testing.T) {
 
 func TestWrongTurn(t *testing.T) {
 	g := NewGame()
-	err := g.OwnSquare(playerX, 0, 0)
+	err := g.OwnSquare(PlayerX, 0, 0)
 	if err != nil {
 		t.Fatalf("Valid player move resulted in error %v", err)
 	}
-	err = g.OwnSquare(playerX, 0, 1)
+	err = g.OwnSquare(PlayerX, 0, 1)
 	if err == nil {
 		// should fail since it player O's turn now
 		t.Fatalf("Move by wrong player suceeded ")
@@ -56,7 +56,7 @@ func TestWrongTurn(t *testing.T) {
 func TestBadMove(t *testing.T) {
 	// try to own a invalid square
 	g := NewGame()
-	err := g.OwnSquare(playerX, 5, 5)
+	err := g.OwnSquare(PlayerX, 5, 5)
 	if err == nil {
 		t.Fatalf("Bad move succeeded")
 	}
@@ -64,17 +64,17 @@ func TestBadMove(t *testing.T) {
 
 func TestWinner(t *testing.T) {
 	g := NewGame()
-	g.OwnSquare(playerX, 0, 0)
-	g.OwnSquare(playerO, 1, 0)
-	g.OwnSquare(playerX, 0, 2)
-	g.OwnSquare(playerO, 1, 1)
-	g.OwnSquare(playerX, 2, 0)
-	if g.winner != playerU {
+	g.OwnSquare(PlayerX, 0, 0)
+	g.OwnSquare(PlayerO, 1, 0)
+	g.OwnSquare(PlayerX, 0, 2)
+	g.OwnSquare(PlayerO, 1, 1)
+	g.OwnSquare(PlayerX, 2, 0)
+	if g.winner != PlayerU {
 		t.Fatalf("Wrong winner %v", g)
 	}
-	g.OwnSquare(playerO, 1, 2)
-	// playerO should have won now
-	if g.winner != playerO {
+	g.OwnSquare(PlayerO, 1, 2)
+	// PlayerO should have won now
+	if g.winner != PlayerO {
 		t.Fatalf("Wrong winner %v", g)
 	}
 	// serialize/deserailize

@@ -8,21 +8,21 @@ import "bytes"
 type Player byte
 
 const (
-	playerU Player = iota // used to demarcate no player claimed a square
-	playerX
-	playerO
+	PlayerU Player = iota // used to demarcate no player claimed a square
+	PlayerX
+	PlayerO
 )
 
 func (p Player) String() string {
 
 	switch p {
-	case playerX:
+	case PlayerX:
 		return "X"
 
-	case playerO:
+	case PlayerO:
 		return "O"
 
-	case playerU:
+	case PlayerU:
 		return "U"
 
 	default:
@@ -53,7 +53,7 @@ func (g Game) String() string {
 
 func NewGame() *Game {
 	g := Game{}
-	g.turn = playerX // playerX has first move by default
+	g.turn = PlayerX // PlayerX has first move by default
 	return &g
 }
 
@@ -62,10 +62,10 @@ func (g *Game) Serialize() []byte {
 	var b bytes.Buffer
 
 	// store turn in first byte and the board itself in next three bytes
-	if g.turn == playerX {
+	if g.turn == PlayerX {
 		b.WriteByte(1)
 	} else {
-		b.WriteByte(0)
+		b.WriteByte(2)
 	}
 	for i := 0; i < len(g.board[0]); i++ {
 		var x byte
@@ -86,7 +86,7 @@ func DeSerialize(buf []byte) (*Game, error) {
 	b := bytes.NewBuffer(buf)
 	x, _ := b.ReadByte()
 	turn := Player(x)
-	if turn != playerX && turn != playerO {
+	if turn != PlayerX && turn != PlayerO {
 		return nil, errors.New("Cannot deserialize game.")
 	}
 	g.turn = turn
@@ -95,24 +95,24 @@ func DeSerialize(buf []byte) (*Game, error) {
 		x, _ = b.ReadByte()
 		for j := 0; j < len(g.board[0]); j++ {
 			player := Player((x >> (2 * j)) & 0x3)
-			if player != playerX && player != playerO && player != playerU {
+			if player != PlayerX && player != PlayerO && player != PlayerU {
 				return nil, errors.New("Cannot deserialize game.")
 			}
 			g.board[i][j] = player
 		}
 	}
-	g.winner = g.checkWinner()
+	g.winner = g.CheckWinner()
 	return g, nil
 }
 
 func (g *Game) OwnSquare(p Player, x int, y int) error {
 
-	if g.winner != playerU {
+	if g.winner != PlayerU {
 		// already some player won the game.
 		return errors.New("Game over  ")
 	}
 
-	if p != playerX && p != playerO {
+	if p != PlayerX && p != PlayerO {
 		return errors.New("Bad Player")
 	}
 
@@ -124,55 +124,55 @@ func (g *Game) OwnSquare(p Player, x int, y int) error {
 		return errors.New("Bad x or y ")
 	}
 
-	if g.board[x][y] != playerU {
+	if g.board[x][y] != PlayerU {
 		return errors.New("Already claimed square ")
 	}
 
 	g.board[x][y] = p
-	g.winner = g.checkWinner()
-	if g.turn == playerX {
-		g.turn = playerO
+	g.winner = g.CheckWinner()
+	if g.turn == PlayerX {
+		g.turn = PlayerO
 	} else {
-		g.turn = playerX
+		g.turn = PlayerX
 	}
 	return nil
 }
 
-func (g *Game) checkWinner() Player {
+func (g *Game) CheckWinner() Player {
 
 	b := &g.board
 
 	// check rows for winner
 	for i := 0; i < len(b[0]); i++ {
-		if b[i][0] != playerU && b[i][0] == b[i][1] && b[i][0] == b[i][2] {
+		if b[i][0] != PlayerU && b[i][0] == b[i][1] && b[i][0] == b[i][2] {
 			return b[i][0]
 		}
 	}
 	// check columns
 	for i := 0; i < len(b[0]); i++ {
-		if b[0][i] != playerU && b[0][i] == b[1][i] && b[0][i] == b[2][i] {
+		if b[0][i] != PlayerU && b[0][i] == b[1][i] && b[0][i] == b[2][i] {
 			return b[0][i]
 		}
 	}
 	// check diagonals
-	if b[0][0] != playerU && b[0][0] == b[1][1] && b[0][0] == b[2][2] {
+	if b[0][0] != PlayerU && b[0][0] == b[1][1] && b[0][0] == b[2][2] {
 		return b[0][0]
 	}
-	if b[0][2] != playerU && b[0][2] == b[1][1] && b[0][0] == b[2][0] {
+	if b[0][2] != PlayerU && b[0][2] == b[1][1] && b[0][0] == b[2][0] {
 		return b[0][0]
 	}
-	return playerU
+	return PlayerU
 }
 
 /*
 func main() {
 	g := NewGame()
 	fmt.Println(g)
-	err := g.OwnSquare(playerX, 5, 7)
+	err := g.OwnSquare(PlayerX, 5, 7)
 	if err != nil {
 		log.Printf("%v ", err)
 	}
-	err = g.OwnSquare(playerX, 0, 0)
+	err = g.OwnSquare(PlayerX, 0, 0)
 	if err != nil {
 		fmt.Println(err)
 	}
