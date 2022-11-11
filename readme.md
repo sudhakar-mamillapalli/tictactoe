@@ -1,52 +1,109 @@
 # tictactoe
 **tictactoe** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
 
-## Get started
+ Implement a Cosmos module for a tic-tac-toe game.
 
-```
-ignite chain serve
-```
+## Rules for tic-tac-toe:
 
-`serve` command installs dependencies, builds, initializes, and starts your blockchain in development.
+* All state of the game should live on-chain. State includes open games, games currently in progress and completed games.
 
-### Configure
+* Any user can submit a transaction to the network to invite others to start a game (i.e. create an open game).
 
-Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
+* Other users may submit transactions to accept invitations. When an invitation is accepted, the game starts.
 
-### Web Frontend
+* The roles of “X” and “O” are decided as follows. The user's public keys are concatenated and the result is hashed. If the first bit of the output is 0, then the game's initiator (whoever posted the invitation) plays "O" and the second player plays "X" and vice versa. “X” has the first move.
 
-Ignite CLI has scaffolded a Vue.js-based web app in the `vue` directory. Run the following commands to install dependencies and start the app:
+* Both users submit transactions to the network to make their moves until the game is complete.
 
-```
-cd vue
-npm install
-npm run serve
-```
+* The game needs to support multiple concurrent games sessions/players.
 
-The frontend app is built using the `@starport/vue` and `@starport/vuex` packages. For details, see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
+## Basic Design
 
-## Release
-To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
+Based on https://tutorials.cosmos.network/hands-on-exercise/1-ignite-cli/.
 
-```
-git tag v0.1
-git push origin v0.1
-```
+Games come into existence and are played in three steps.
 
-After a draft release is created, make your final changes from the release page and publish it.
+1. create-game - This creates a new name which is assigned a unique integer ID.
+   The creator of this transaction puts his game on the blockchain and waits
+   for other account holders to accept the challenge. The game is stored in
+   initiated game list on the blockchain.
 
-### Install
-To install the latest version of your blockchain node's binary, execute the following command on your machine:
+2. start-game - Next account holders can looks up created games, and then can
+   start them using the games ID.  The account which created the game and the account
+   which started the game become the two players.  The game is also moved to
+   stored-game list on the blockchain.
 
-```
-curl https://get.ignite.com/sudhakar-mamillapalli/tictactoe@latest! | sudo bash
-```
-`sudhakar-mamillapalli/tictactoe` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
+3. claim-square - The two players above each in turn can claim a square using this transcation.
+   Once one of the player wins the game it is  moved to the completed games list on the blockchain
 
-## Learn more
+## Usage
 
-- [Ignite CLI](https://ignite.com/cli)
-- [Tutorials](https://docs.ignite.com/guide)
-- [Ignite CLI docs](https://docs.ignite.com)
-- [Cosmos SDK docs](https://docs.cosmos.network)
-- [Developer Chat](https://discord.gg/ignite)
+### Relevant versions:
+
+OS: Fedora 36
+
+Arch: amd64
+
+SDK version: v0.46.3
+
+Ignite CLI version: v0.25.1
+
+### Build
+
+>git clone https://github.com/sudhakar-mamillapalli/tictactoe.git tictactoe
+>
+>cd tictactoe
+>
+>ignite chain serve
+
+### Sample commands to create and play games on the blockchain
+
+0. Get hold of $alice and bob's addresses
+
+> export alice=$(tictactoed keys show alice -a)
+>
+> export bob=$(tictactoed keys show bob -a)
+
+
+1. Create two games. One by alice and one by bob
+
+>tictactoed tx tictactoe create-game --from $alice
+>
+>tictactoed tx tictactoe create-game --from $bob
+
+
+2. Check they show up in initiated games list
+
+> tictactoed query tictactoe list-initiate-game
+
+
+3. Bob accepts challenge on game 1 and starts it
+
+> tictactoed tx tictactoe start-game 1 --from $bob
+
+4. Game 1 now moves to stored game list
+
+> tictactoed query tictactoe list-stored-game
+
+5. Make moves till Bob gets to be the winner
+
+> tictactoed tx tictactoe claim-square 1 0 0 --from $alice
+
+> tictactoed tx tictactoe claim-square 1 1 0 --from $bob
+
+> tictactoed tx tictactoe claim-square 1 0 2 --from $alice
+
+> tictactoed tx tictactoe claim-square 1 1 1 --from $bob
+
+> tictactoed tx tictactoe claim-square 1 2 0 --from $alice
+
+> tictactoed tx tictactoe claim-square 1 1 2 --from $bob
+
+
+5.  Check that completed game (1) is in completed games list and game 2 is still in initiated game list
+
+> tictactoed query tictactoe list-completed-game
+
+> tictactoed query tictactoe list-initiate-game
+
+
